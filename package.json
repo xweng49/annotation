@@ -1,0 +1,32 @@
+{
+  "name": "npm-init",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel ./src/index.html --open"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
+    "clsx": "^1.1.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-full-screen": "^0.3.2-0",
+    "react-fullscreen-image": "0.0.3",
+    "react-hot-keys": "^2.6.2",
+    "react-material-workspace-layout": "^1.0.9",
+    "react-monaco-editor": "^0.41.2",
+    "react-select": "^3.1.1",
+    "react-syntax-highlighter": "^15.4.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10"
+  }
+}
