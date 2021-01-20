@@ -25,7 +25,7 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
 import NavigateNextIcon from '@material-ui/icons/NavigateNext'
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore'
-
+import Canvas from "../Canvas"
 
 const FullScreenContainer = styled("div")({
     width: "100%",
@@ -85,8 +85,6 @@ export const MainLayout = ({
     //     imgRef.current.src = image[imageIndex]["src"]
     // }
 
-
-
     return (
         <FullScreenContainer onKeyDown={handleKeyPress} tabIndex="0">            
             <FullScreen
@@ -96,10 +94,13 @@ export const MainLayout = ({
                         fullScreenHandle.exit()
                     }
                 }}
-                
-                
             >
-                <div className={classes.root}>
+                <div 
+                    style={{
+                        width: "100%",
+                        height: "100%"
+                    }}
+                >
                     <Drawer
                         variant="permanent"
                         className={clsx(classes.drawer, {
@@ -138,19 +139,13 @@ export const MainLayout = ({
                                 </ListItem>
                         </List>
                     </Drawer>
-                    <img src = {image[imageIndex]["src"]} width="50%" height="50%" /*ref = {imgRef}*//>
+                    <div className={classes.root}>
+                    <Canvas />
+                    </div>
                 </div>
         </FullScreen>
         </FullScreenContainer>
     )
 }
- export default MainLayout
 
-                //  {/* <MiniDrawer></MiniDrawer> */}
-                //  <button onClick = {fullScreenToggle}>{fullScreenHandle.active? "Exit Full Screen" : "Full Screen"}</button>
-                //  <button onClick = {() => imageIndex > 0 ? setImageIndex(imageIndex-1) : null}>Prev</button>
-                //  <button onClick = {() => imageIndex < image.length-1 ? setImageIndex(imageIndex+1) : null }>Next</button>
-                //  <Button variant="contained">Tests</Button>
-                //  <h1>{taskDescription}</h1>
-                //  <p>{image[imageIndex]["name"]}</p>
-                //  <img src = {image[imageIndex]["src"]} width="50%" height="50%" /*ref = {imgRef}*//>
+export default MainLayout
