@@ -25,6 +25,7 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
 import NavigateNextIcon from '@material-ui/icons/NavigateNext'
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore'
+import PanToolIcon from '@material-ui/icons/PanTool'
 import Canvas from "../Canvas"
 
 const FullScreenContainer = styled("div")({
@@ -47,6 +48,7 @@ export const MainLayout = ({
 }) => {
     const fullScreenHandle = useFullScreenHandle()
     const [imageIndex, setImageIndex] = useState(0)
+    const [mode, setMode] = useState(null)
     const fullScreenToggle = () => {
         return fullScreenHandle.active ? fullScreenHandle.exit() : fullScreenHandle.enter()
     }
@@ -126,21 +128,26 @@ export const MainLayout = ({
                         <Divider />
                         <List>
                                 <ListItem button key="fullscreen" onClick = {fullScreenToggle}>
-                                <ListItemIcon>{fullScreenHandle.active? <FullscreenExitIcon />:<FullscreenIcon />}</ListItemIcon>
-                                <ListItemText primary={fullScreenHandle.active? "Exit Fullscreen": "Fullscreen"} />
+                                    <ListItemIcon>{fullScreenHandle.active? <FullscreenExitIcon />:<FullscreenIcon />}</ListItemIcon>
+                                    <ListItemText primary={fullScreenHandle.active? "Exit Fullscreen": "Fullscreen"} />
                                 </ListItem>
                                 <ListItem button key="next" onClick = {() => imageIndex > 0 ? setImageIndex(imageIndex-1): null}>
-                                <ListItemIcon><NavigateNextIcon /></ListItemIcon>
-                                <ListItemText primary="Next" />
+                                    <ListItemIcon><NavigateNextIcon /></ListItemIcon>
+                                    <ListItemText primary="Next" />
                                 </ListItem>
                                 <ListItem button key="prev" onClick = {() => imageIndex < image.length-1 ? setImageIndex(imageIndex+1): null}>
-                                <ListItemIcon><NavigateBeforeIcon /></ListItemIcon>
-                                <ListItemText primary="Prev" />
+                                    <ListItemIcon><NavigateBeforeIcon /></ListItemIcon>
+                                    <ListItemText primary="Prev" />
+                                </ListItem>
+                                <ListItem button key="pan" onClick = {() => mode!="pan" ? setMode("pan"): setMode(null)}>
+                                    <ListItemIcon><PanToolIcon /></ListItemIcon>
+                                    <ListItemText primary="Pan" />
                                 </ListItem>
                         </List>
                     </Drawer>
                     <div className={classes.root}>
-                    <Canvas />
+                        {/* <img src={image[imageIndex]["src"]} /> */}
+                    <Canvas image_path={image[imageIndex]["src"]} mode={mode}/>
                     </div>
                 </div>
         </FullScreen>

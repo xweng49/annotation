@@ -6,22 +6,24 @@ const Canvas = props => {
   
     const canvasRef = useRef(null)
     const [points, changePoints] = useState([])
+    const [mode, setMode] = useState(props.mode)
     let ctx = null
     var lastX=null
     var lastY=null
     var img = null
     var dragStart,dragged
     var scaleFactor = null
+    if (mode != props.mode) {
+      console.log("mode is: " + props.mode)
+      setMode(props.mode)
+    }
+
 
     function redraw() {
       var p1 = ctx.transformedPoint(0,0);
 			var p2 = ctx.transformedPoint(canvasRef.current.width,canvasRef.current.height);
       ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
-      // img = new Image()
-      // img.src = "https://www.healthng.com/wp-content/uploads/2017/01/Cucumber-1.jpg"
-      // img.onload = () => {
       ctx.drawImage(img, 0, 0)
-      // }
     }
     
     var zoom = function(clicks){
@@ -88,6 +90,53 @@ const Canvas = props => {
         return pt.matrixTransform(xform.inverse());
       }
     }
+    
+    function mousedown(evt) {
+      document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+      lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+      lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+      dragStart = ctx.transformedPoint(lastX,lastY);
+      dragged = false;
+    }
+    function mousemove(evt) {
+      lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+      lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+      dragged = true;
+      if (dragStart){
+        var pt = ctx.transformedPoint(lastX,lastY);
+        ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
+        redraw();
+      }
+    }
+    function mouseup(evt) {
+      dragStart = null;
+      if (!dragged) zoom(evt.shiftKey ? -1 : 1 );
+    }
+    var handleScroll = function(evt){
+      var delta = evt.wheelDelta ? evt.wheelDelta/40 : evt.detail ? -evt.detail : 0;
+      if (delta) zoom(delta);
+      return evt.preventDefault() && false;
+    };
+
+    var panEventListener = function(canvas, mode) {
+      if (mode == "pan") {
+        console.log('turning on')
+        canvas.addEventListener('mousedown', mousedown, false);
+        canvas.addEventListener('mousemove', mousemove,false);
+        canvas.addEventListener('mouseup', mouseup,false);
+        scaleFactor = 1.1;
+        canvas.addEventListener('DOMMouseScroll',handleScroll,false);
+        canvas.addEventListener('mousewheel',handleScroll,false);
+      }
+      else {
+        console.log('turning off')
+        canvas.removeEventListener('mousedown', mousedown, false);
+        canvas.removeEventListener('mousemove', mousemove, false);
+        canvas.removeEventListener('mouseup', mouseup, false);
+        canvas.removeEventListener('DOMMouseScroll',handleScroll, false);
+        canvas.removeEventListener('mousewheel',handleScroll, false);
+      }
+    }
 
     
     useEffect(() => {
@@ -95,61 +144,70 @@ const Canvas = props => {
         canvas.width = 800
         canvas.height = 600
         lastX=canvas.width/2, lastY=canvas.height/2
+        console.log('test')
+
         img = new Image()
-        img.src = "https://www.healthng.com/wp-content/uploads/2017/01/Cucumber-1.jpg"
+        img.src = props.image_path
         ctx = canvas.getContext('2d')
+        trackTransforms(ctx)
         img.onload = () => {
+          console.log(props)
+          ctx.setTransform(1,0,0,1,0,0)
+          ctx.clearRect(0,0,canvas.width, canvas.height)
           ctx.drawImage(img, 0, 0)
         }
-        trackTransforms(ctx)
-        
-        canvas.addEventListener('mousedown',function(evt){
-          document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-          lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-          lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-          dragStart = ctx.transformedPoint(lastX,lastY);
-          dragged = false;
-        },false);
-        canvas.addEventListener('mousemove',function(evt){
-          lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-          lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-          dragged = true;
-          if (dragStart){
-            var pt = ctx.transformedPoint(lastX,lastY);
-            ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
-            redraw();
-          }
-        },false);
-        canvas.addEventListener('mouseup',function(evt){
-          dragStart = null;
-          if (!dragged) zoom(evt.shiftKey ? -1 : 1 );
-        },false);
-        scaleFactor = 1.1;
+        console.log("oneffect")
+        // panEventListener(canvas, props.mode)
+        if (mode == "pan") {
+          console.log('turning on')
+          canvas.addEventListener('mousedown', mousedown, false);
+          canvas.addEventListener('mousemove', mousemove,false);
+          canvas.addEventListener('mouseup', mouseup,false);
+          scaleFactor = 1.1;
+          canvas.addEventListener('DOMMouseScroll',handleScroll,false);
+          canvas.addEventListener('mousewheel',handleScroll,false);
+        }
+        //   canvas.addEventListener('mousedown',function(evt){
+        //     document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+        //     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+        //     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+        //     dragStart = ctx.transformedPoint(lastX,lastY);
+        //     dragged = false;
+        //   },false);
+        //   canvas.addEventListener('mousemove',function(evt){
+        //     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+        //     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+        //     dragged = true;
+        //     if (dragStart){
+        //       var pt = ctx.transformedPoint(lastX,lastY);
+        //       ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
+        //       redraw();
+        //     }
+        //   },false);
+        //   canvas.addEventListener('mouseup',function(evt){
+        //     dragStart = null;
+        //     if (!dragged) zoom(evt.shiftKey ? -1 : 1 );
+        //   },false);
+        //   scaleFactor = 1.1;
 
+        //   var handleScroll = function(evt){
+        //     var delta = evt.wheelDelta ? evt.wheelDelta/40 : evt.detail ? -evt.detail : 0;
+        //     if (delta) zoom(delta);
+        //     return evt.preventDefault() && false;
+        //   };
+        //   canvas.addEventListener('DOMMouseScroll',handleScroll,false);
+        //   canvas.addEventListener('mousewheel',handleScroll,false);
+        // }
 
-        var handleScroll = function(evt){
-        	var delta = evt.wheelDelta ? evt.wheelDelta/40 : evt.detail ? -evt.detail : 0;
-        	if (delta) zoom(delta);
-        	return evt.preventDefault() && false;
-        };
-        canvas.addEventListener('DOMMouseScroll',handleScroll,false);
-        canvas.addEventListener('mousewheel',handleScroll,false);
-
-
-    }, [])
-
-    // useEffect(() => {
-    //   draw();
-    // }, []);
-
-
-   
-    // const hitBox = (x, y) => {
-    //   let isTarget = null;
-    //   for (let i = 0, i < )
-    // }
-
-
+        return function cleanup() {
+          console.log('turning off')
+          canvas.removeEventListener('mousedown', mousedown, false);
+          canvas.removeEventListener('mousemove', mousemove, false);
+          canvas.removeEventListener('mouseup', mouseup, false);
+          canvas.removeEventListener('DOMMouseScroll',handleScroll, false);
+          canvas.removeEventListener('mousewheel',handleScroll, false);
+        }
+    }, [props.image_path, props.mode])
     return <canvas ref={canvasRef} {...props}/>
 }
 
